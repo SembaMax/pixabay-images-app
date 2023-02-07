@@ -1,4 +1,5 @@
 pluginManagement {
+    includeBuild("build-logic")
     repositories {
         google()
         mavenCentral()
@@ -13,7 +14,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "PixabayImages"
+rootProject.name = "pixabayimages"
 include(":app")
 include(":feature:searchscreen")
 include(":feature:detailscreen")

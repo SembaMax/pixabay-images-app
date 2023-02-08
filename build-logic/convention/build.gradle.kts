@@ -25,7 +25,7 @@ gradlePlugin {
             implementationClass = "AndroidHiltConventionPlugin"
         }
         register("androidFeature") {
-            id = "pixabayimages.android.feature.ui"
+            id = "pixabayimages.android.feature"
             implementationClass = "AndroidFeatureConventionPlugin"
         }
         register("androidLibraryCompose") {

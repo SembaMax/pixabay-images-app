@@ -56,6 +56,7 @@ dependencies {
 
     implementation(project(":feature:searchscreen"))
     implementation(project(":feature:detailscreen"))
+    implementation(project(":core:design"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.ktx)

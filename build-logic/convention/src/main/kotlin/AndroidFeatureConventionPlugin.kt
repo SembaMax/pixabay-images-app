@@ -31,7 +31,7 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
 
             dependencies {
                 add("implementation", project(":data:model"))
-                add("implementation", project(":data:repositories"))
+                add("implementation", project(":data:repository"))
                 add("implementation", project(":core:common"))
                 add("implementation", project(":core:design"))
 

@@ -1,4 +1,4 @@
-package com.semba.pixabayimages.ui.theme
+package com.semba.pixabayimages.core.design.theme
 
 import androidx.compose.ui.graphics.Color
 

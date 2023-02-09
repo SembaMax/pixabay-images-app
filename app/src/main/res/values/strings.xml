@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">PixabayImages</string>
+    <string name="offline">Offline</string>
 </resources>

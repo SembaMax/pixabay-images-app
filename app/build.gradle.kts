@@ -54,6 +54,7 @@ android {
 
 dependencies {
 
+    implementation(project(":core:common"))
     implementation(project(":feature:searchscreen"))
     implementation(project(":feature:detailscreen"))
     implementation(project(":core:design"))
@@ -62,12 +63,13 @@ dependencies {
     implementation(libs.androidx.lifecycle.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.lifecycle.runtimeCompose)
-    implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.navigation.compose)
 
     //Hilt
     implementation(libs.hilt.android)
+    implementation(libs.androidx.hilt.navigation.compose)
     kapt(libs.hilt.android.compiler)
     kaptAndroidTest(libs.hilt.android.compiler)
     androidTestImplementation(libs.hilt.android.testing)

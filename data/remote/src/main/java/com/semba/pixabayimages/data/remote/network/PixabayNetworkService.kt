@@ -1,6 +1,7 @@
 package com.semba.pixabayimages.data.remote.network
 
 import com.semba.pixabayimages.data.remote.model.SearchResponse
+import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
 
@@ -14,5 +15,5 @@ interface PixabayNetworkService {
                @Query("image_type") imageType: String = "photo",
                @Query("order") order: String = "popular",
                @Query("lang") lang: String = "en"
-    ): Result<SearchResponse>
+    ): Response<SearchResponse>
 }

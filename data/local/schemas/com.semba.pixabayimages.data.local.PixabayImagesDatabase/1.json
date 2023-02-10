@@ -1,0 +1,141 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "ee62138d079c931ef9eee3bcb9878434",
+    "entities": [
+      {
+        "tableName": "images",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`imageId` INTEGER NOT NULL, `type` TEXT NOT NULL, `tags` TEXT NOT NULL, `imageURL` TEXT NOT NULL, `fullHDURL` TEXT NOT NULL, `views` INTEGER NOT NULL, `downloads` INTEGER NOT NULL, `likes` INTEGER NOT NULL, `comments` INTEGER NOT NULL, `user` TEXT NOT NULL, `userImageURL` TEXT NOT NULL, PRIMARY KEY(`imageId`))",
+        "fields": [
+          {
+            "fieldPath": "imageId",
+            "columnName": "imageId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tags",
+            "columnName": "tags",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "imageURL",
+            "columnName": "imageURL",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fullHDURL",
+            "columnName": "fullHDURL",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "views",
+            "columnName": "views",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "downloads",
+            "columnName": "downloads",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "likes",
+            "columnName": "likes",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "comments",
+            "columnName": "comments",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "user",
+            "columnName": "user",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "userImageURL",
+            "columnName": "userImageURL",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "imageId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "queries",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`searchQuery` TEXT NOT NULL, PRIMARY KEY(`searchQuery`))",
+        "fields": [
+          {
+            "fieldPath": "searchQuery",
+            "columnName": "searchQuery",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "searchQuery"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "SearchQueryImagesCrossRef",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`searchQuery` TEXT NOT NULL, `imageId` INTEGER NOT NULL, PRIMARY KEY(`searchQuery`, `imageId`))",
+        "fields": [
+          {
+            "fieldPath": "searchQuery",
+            "columnName": "searchQuery",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "imageId",
+            "columnName": "imageId",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "searchQuery",
+            "imageId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ee62138d079c931ef9eee3bcb9878434')"
+    ]
+  }
+}

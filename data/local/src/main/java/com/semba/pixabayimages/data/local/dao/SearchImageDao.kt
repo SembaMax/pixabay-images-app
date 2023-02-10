@@ -21,6 +21,6 @@ interface SearchImageDao {
 
     @Transaction
     @Query("SELECT * FROM queries WHERE searchQuery = :query")
-    suspend fun getAllImagesOfQuery(query: String): Flow<List<SearchQueryWithImages>>
+    suspend fun getAllImagesOfQuery(query: String): List<SearchQueryWithImages>
 
 }

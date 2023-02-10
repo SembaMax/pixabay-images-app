@@ -15,7 +15,7 @@ object DatabaseModule {
 
     @Provides
     @Singleton
-    fun provideDatabase(context: Context): PixabayImagesDatabase {
+    fun providesDatabase(context: Context): PixabayImagesDatabase {
         return Room.databaseBuilder(context, PixabayImagesDatabase::class.java, "pixabay-database").build()
     }
 }

@@ -7,6 +7,6 @@ import androidx.room.PrimaryKey
     tableName = "queries"
 )
 data class SearchQueryEntity (
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = false)
     val searchQuery: String
         )

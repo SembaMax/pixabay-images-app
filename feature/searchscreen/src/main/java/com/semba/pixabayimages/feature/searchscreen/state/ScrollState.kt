@@ -1,4 +1,4 @@
-package com.semba.pixabayimages.feature.searchscreen
+package com.semba.pixabayimages.feature.searchscreen.state
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf

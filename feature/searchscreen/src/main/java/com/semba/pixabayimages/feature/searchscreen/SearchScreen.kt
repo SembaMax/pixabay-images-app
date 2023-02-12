@@ -6,10 +6,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyGridState
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -31,14 +28,24 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.semba.pixabayimages.core.design.theme.TextField_Container_Color
+import com.semba.pixabayimages.data.model.search.ImageItem
+import com.semba.pixabayimages.feature.searchscreen.state.ScrollState
+import com.semba.pixabayimages.feature.searchscreen.state.SearchUiState
+import com.semba.pixabayimages.feature.searchscreen.state.TopBarState
 import kotlinx.coroutines.cancelChildren
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import com.semba.pixabayimages.core.design.R as DesignR
 
 private val MinTopBarHeight = 96.dp
 private val MaxTopBarHeight = 150.dp
 
+@OptIn(ExperimentalLifecycleComposeApi::class)
 @Preview
 @Composable
 fun SearchScreen() {
@@ -79,6 +86,10 @@ fun SearchScreen() {
         }
     }
 
+    val viewModel: SearchViewModel = hiltViewModel()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val queryState = remember { viewModel.queryState }
+
     Box(modifier = Modifier
         .nestedScroll(nestedScrollConnection)
         .background(MaterialTheme.colorScheme.background)) {
@@ -91,23 +102,24 @@ fun SearchScreen() {
                         onPress = { scope.coroutineContext.cancelChildren() }
                     )
                 },
-            gridState)
+            gridState,
+            uiState,
+            loadMore = { viewModel.loadNextPage() })
+
         CollapsingTopBar(modifier = Modifier
             .fillMaxWidth()
             .height(with(LocalDensity.current) { toolbarState.height.toDp() })
             .graphicsLayer { translationY = toolbarState.offset },
-            progress = toolbarState.progress)
+            progress = toolbarState.progress,
+            queryState = queryState,
+            onSearchClick = { viewModel.onSearchClick() })
     }
 }
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CollapsingTopBar(modifier: Modifier = Modifier, progress : Float = 0f) {
-
-    var text by remember {
-        mutableStateOf("")
-    }
+fun CollapsingTopBar(modifier: Modifier = Modifier, progress : Float = 0f, queryState: MutableState<String>, onSearchClick: () -> Unit) {
 
     Surface(modifier = modifier) {
 
@@ -133,8 +145,8 @@ fun CollapsingTopBar(modifier: Modifier = Modifier, progress : Float = 0f) {
                     horizontalArrangement = Arrangement.SpaceAround
                 ) {
                     TextField(
-                        value = text,
-                        onValueChange = { text = it },
+                        value = queryState.value,
+                        onValueChange = { queryState.value = it },
                     modifier = Modifier.weight(0.8f),
                         colors = TextFieldDefaults.textFieldColors(
                             containerColor = TextField_Container_Color,
@@ -147,7 +159,7 @@ fun CollapsingTopBar(modifier: Modifier = Modifier, progress : Float = 0f) {
 
                     Box(modifier = Modifier
                         .weight(0.2f)) {
-                        IconButton(onClick = {},
+                        IconButton(onClick = { onSearchClick() },
                             Modifier
                                 .size(30.dp)
                                 .clip(CircleShape)
@@ -168,18 +180,48 @@ fun CollapsingTopBar(modifier: Modifier = Modifier, progress : Float = 0f) {
     }
 }
 
+const val CELL_COUNT = 2
 @Composable
-fun ImagesGrid(modifier: Modifier = Modifier, gridState: LazyGridState = rememberLazyGridState()) {
+fun ImagesGrid(modifier: Modifier = Modifier, gridState: LazyGridState = rememberLazyGridState(), uiState: SearchUiState, loadMore: () -> Unit) {
+
+    val uiStateUpdated by rememberUpdatedState(newValue = uiState)
+    val shouldLoadMore = remember {
+        derivedStateOf {
+            !uiStateUpdated.isLoading && !uiStateUpdated.limitReached && (gridState.layoutInfo.visibleItemsInfo.lastOrNull()?.index
+                ?: -100) >= (gridState.layoutInfo.totalItemsCount - 6)
+        }
+    }
+
+    LaunchedEffect(key1 = shouldLoadMore.value) {
+        if (shouldLoadMore.value)
+            loadMore()
+    }
 
     LazyVerticalGrid(
         modifier = modifier.padding(start = 7.dp, end = 7.dp, bottom = 7.dp, top = 7.dp),
         state = gridState,
-        columns = GridCells.Fixed(2),
+        columns = GridCells.Fixed(CELL_COUNT),
         verticalArrangement = Arrangement.spacedBy(10.dp),
-        horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-        items(40) {
-            ImageGridItem()
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        items(uiStateUpdated.imageItems.size) {
+            ImageGridItem(item = uiStateUpdated.imageItems[it])
         }
+
+        if (uiStateUpdated.isLoading) {
+            item(span = { GridItemSpan(CELL_COUNT) }) {
+                LoadingItem()
+            }
+        }
+    }
+}
+
+@Composable
+fun LoadingItem() {
+    Box() {
+        CircularProgressIndicator(
+            modifier = Modifier.size(50.dp).padding(10.dp).align(Alignment.Center)
+        )
     }
 }
 

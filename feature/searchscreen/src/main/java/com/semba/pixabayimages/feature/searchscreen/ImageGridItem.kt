@@ -16,14 +16,19 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.semba.pixabayimages.data.model.search.ImageItem
+
+const val CARD_HEIGHT = 200
+const val BOTTOM_BOX_HEIGHT = 60
+const val CARD_CONTENT_PADDING = 5
 
 @Composable
-fun ImageGridItem(modifier: Modifier = Modifier) {
-    Card(modifier = modifier.height(300.dp), shape = RoundedCornerShape(10.dp)) {
+fun ImageGridItem(modifier: Modifier = Modifier, item: ImageItem) {
+    Card(modifier = modifier.height(CARD_HEIGHT.dp), shape = RoundedCornerShape(10.dp)) {
         Box(modifier = Modifier.fillMaxSize()) {
-            AsyncImage(modifier = Modifier.fillMaxSize(), model = "https://friendofthesea.org/wp-content/uploads/baby-sea-turtles-fos-certification-small.jpg", contentDescription = null, contentScale = ContentScale.Crop)
+            AsyncImage(modifier = Modifier.fillMaxSize(), model = item.imageURL, contentDescription = null, contentScale = ContentScale.Crop)
 
-            BottomBar(username = "Sea Turtule", tags = "sea, turtules, ocean, marine, water, underwater, wild, wildlife")
+            BottomBar(username = item.user, tags = item.tags)
         }
     }
 }
@@ -33,11 +38,10 @@ private fun BoxScope.BottomBar(username: String, tags: String) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .height(70.dp)
-            .padding(5.dp)
+            .height(BOTTOM_BOX_HEIGHT.dp)
             .background(MaterialTheme.colorScheme.outline)
             .align(Alignment.BottomCenter),
-        verticalArrangement = Arrangement.SpaceAround,
+        verticalArrangement = Arrangement.SpaceEvenly,
         horizontalAlignment = Alignment.Start
     ) {
         Text(
@@ -49,6 +53,7 @@ private fun BoxScope.BottomBar(username: String, tags: String) {
             color = MaterialTheme.colorScheme.onPrimary,
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(start = CARD_CONTENT_PADDING.dp, end = CARD_CONTENT_PADDING.dp)
         )
 
         Text(
@@ -60,6 +65,7 @@ private fun BoxScope.BottomBar(username: String, tags: String) {
             color = MaterialTheme.colorScheme.onPrimaryContainer,
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(start = CARD_CONTENT_PADDING.dp, end = CARD_CONTENT_PADDING.dp)
         )
     }
 }

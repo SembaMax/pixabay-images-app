@@ -1,6 +1,6 @@
-package com.semba.pixabayimages.feature.searchscreen
+package com.semba.pixabayimages.feature.searchscreen.state
 
-abstract class TopBarScrollState(heightRange: IntRange) :TopBarState {
+abstract class TopBarScrollState(heightRange: IntRange) : TopBarState {
 
     init {
         require(heightRange.first >= 0 && heightRange.last >= heightRange.first) {

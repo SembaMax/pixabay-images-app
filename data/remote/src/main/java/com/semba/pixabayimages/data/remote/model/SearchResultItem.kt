@@ -3,15 +3,14 @@ package com.semba.pixabayimages.data.remote.model
 import com.semba.pixabayimages.data.model.search.ImageItem
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import com.semba.pixabayimages.core.common.Result
 
 @Serializable
 data class SearchResultItem (
     @SerialName("id") val id: Long,
     @SerialName("type") val type: String,
     @SerialName("tags") val tags: String,
-    @SerialName("imageURL") val imageURL: String,
-    @SerialName("fullHDURL") val fullHDURL: String,
+    @SerialName("webformatURL") val imageURL: String,
+    @SerialName("largeImageURL") val fullHDURL: String,
     @SerialName("views") val views: Int,
     @SerialName("downloads") val downloads: Int,
     @SerialName("likes") val likes: Int,

@@ -7,13 +7,14 @@ import retrofit2.http.Query
 
 interface PixabayNetworkService {
 
-    @GET(Routes.SEARCH_ENDPOINT)
-    fun search(@Query("key") key: String = "",
-               @Query("q") query: String,
-               @Query("page") page: Int = 1,
-               @Query("per_page") pageSize: Int = 60,
-               @Query("image_type") imageType: String = "photo",
-               @Query("order") order: String = "popular",
-               @Query("lang") lang: String = "en"
+    @GET(Routes.SEARCH_IMAGES_ENDPOINT)
+    suspend fun search(
+        @Query("key") key: String = "",
+        @Query("q") query: String,
+        @Query("page") page: Int = 1,
+        @Query("per_page") pageSize: Int = 60,
+        @Query("image_type") imageType: String = "photo",
+        @Query("order") order: String = "popular",
+        @Query("lang") lang: String = "en"
     ): Response<SearchResponse>
 }

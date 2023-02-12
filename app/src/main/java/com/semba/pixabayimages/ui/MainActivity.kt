@@ -7,6 +7,7 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -14,6 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
@@ -59,9 +61,9 @@ class MainActivity : ComponentActivity() {
                         val isOffline by appState.isOffline.collectAsState()
 
                         if (isOffline) {
-                            Box(modifier = Modifier.padding(5.dp).clip(CircleShape).background(MaterialTheme.colorScheme.error))
+                            Box(modifier = Modifier.clip(RoundedCornerShape(7.dp)).background(MaterialTheme.colorScheme.error))
                             {
-                                Text(text = stringResource(R.string.offline), fontSize = 10.sp, color = MaterialTheme.colorScheme.onError)
+                                Text(modifier = Modifier.padding(3.dp), text = stringResource(R.string.offline), fontSize = 10.sp, color = MaterialTheme.colorScheme.onError, fontWeight = FontWeight.Bold)
                             }
                         }
                     }

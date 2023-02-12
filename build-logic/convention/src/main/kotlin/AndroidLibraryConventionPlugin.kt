@@ -20,7 +20,7 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             }
 
             dependencies {
-
+                "implementation"(libs.findLibrary("timber").get())
             }
         }
     }

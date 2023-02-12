@@ -35,7 +35,7 @@ okhttpLogging = "4.9.3"
 room = "2.4.3"
 uiAutomator = "2.2.0"
 ksp = "1.7.21-1.0.8"
-
+timberVersion = "5.0.1"
 
 
 [libraries]
@@ -105,6 +105,10 @@ kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-t
 #Gradle dependencies
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "androidGradlePlugin" }
+
+
+#Timber
+timber = { module = "com.jakewharton.timber:timber", version.ref = "timberVersion" }
 
 
 

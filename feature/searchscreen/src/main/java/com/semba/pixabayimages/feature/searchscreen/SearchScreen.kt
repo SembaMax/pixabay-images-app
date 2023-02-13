@@ -4,6 +4,7 @@ import androidx.compose.animation.core.FloatExponentialDecaySpec
 import androidx.compose.animation.core.animateDecay
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.*
@@ -31,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.compose.rememberNavController
 import com.semba.pixabayimages.core.design.theme.TextField_Container_Color
 import com.semba.pixabayimages.data.model.search.ImageItem
 import com.semba.pixabayimages.feature.searchscreen.state.ScrollState
@@ -88,6 +90,7 @@ fun SearchScreen() {
 
     val viewModel: SearchViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val navController = rememberNavController()
     val queryState = remember { viewModel.queryState }
 
     Box(modifier = Modifier
@@ -104,7 +107,8 @@ fun SearchScreen() {
                 },
             gridState,
             uiState,
-            loadMore = { viewModel.loadNextPage() })
+            loadMore = { viewModel.loadNextPage() },
+            onItemClick = { imageItem -> })
 
         CollapsingTopBar(modifier = Modifier
             .fillMaxWidth()
@@ -182,7 +186,7 @@ fun CollapsingTopBar(modifier: Modifier = Modifier, progress : Float = 0f, query
 
 const val CELL_COUNT = 2
 @Composable
-fun ImagesGrid(modifier: Modifier = Modifier, gridState: LazyGridState = rememberLazyGridState(), uiState: SearchUiState, loadMore: () -> Unit) {
+fun ImagesGrid(modifier: Modifier = Modifier, gridState: LazyGridState = rememberLazyGridState(), uiState: SearchUiState, loadMore: () -> Unit, onItemClick: (ImageItem) -> Unit) {
 
     val uiStateUpdated by rememberUpdatedState(newValue = uiState)
     val shouldLoadMore = remember {
@@ -202,10 +206,10 @@ fun ImagesGrid(modifier: Modifier = Modifier, gridState: LazyGridState = remembe
         state = gridState,
         columns = GridCells.Fixed(CELL_COUNT),
         verticalArrangement = Arrangement.spacedBy(10.dp),
-        horizontalArrangement = Arrangement.spacedBy(10.dp)
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         items(uiStateUpdated.imageItems.size) {
-            ImageGridItem(item = uiStateUpdated.imageItems[it])
+            ImageGridItem(modifier = Modifier.clickable { onItemClick(uiStateUpdated.imageItems[it]) }, item = uiStateUpdated.imageItems[it])
         }
 
         if (uiStateUpdated.isLoading) {

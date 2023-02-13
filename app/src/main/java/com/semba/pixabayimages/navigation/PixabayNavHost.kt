@@ -11,7 +11,6 @@ import com.semba.pixabayimages.feature.searchscreen.searchScreen
 @Composable
 fun PixabayNavHost (
     navController: NavHostController,
-    onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
     startDestination: String = searchRoute
 )

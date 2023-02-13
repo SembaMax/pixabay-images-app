@@ -12,6 +12,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
@@ -61,9 +62,13 @@ class MainActivity : ComponentActivity() {
                         val isOffline by appState.isOffline.collectAsState()
 
                         if (isOffline) {
-                            Box(modifier = Modifier.clip(RoundedCornerShape(7.dp)).background(MaterialTheme.colorScheme.error))
+                            Box(modifier = Modifier
+                                .padding(10.dp)
+                                .clip(RoundedCornerShape(7.dp))
+                                .background(MaterialTheme.colorScheme.error)
+                                .align(Alignment.TopEnd))
                             {
-                                Text(modifier = Modifier.padding(3.dp), text = stringResource(R.string.offline), fontSize = 10.sp, color = MaterialTheme.colorScheme.onError, fontWeight = FontWeight.Bold)
+                                Text(modifier = Modifier.padding(7.dp), text = stringResource(R.string.offline), fontSize = 10.sp, color = MaterialTheme.colorScheme.onError, fontWeight = FontWeight.Bold)
                             }
                         }
                     }

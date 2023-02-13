@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("pixabayimages.android.library")
     id("pixabayimages.android.hilt")
@@ -5,6 +7,12 @@ plugins {
 }
 
 android {
+    val properties = Properties()
+    properties.load(project.rootProject.file("local.properties").inputStream())
+    defaultConfig {
+        buildConfigField("String", "PIXAPAY_API_KEY", "\"${properties.getProperty("PIXAPAY_API_KEY")}\"")
+    }
+
     buildFeatures {
         buildConfig = true
     }

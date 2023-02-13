@@ -9,7 +9,6 @@ interface PixabayNetworkService {
 
     @GET(Routes.SEARCH_IMAGES_ENDPOINT)
     suspend fun search(
-        @Query("key") key: String = "",
         @Query("q") query: String,
         @Query("page") page: Int = 1,
         @Query("per_page") pageSize: Int = 60,

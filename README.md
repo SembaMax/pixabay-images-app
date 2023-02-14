@@ -44,7 +44,6 @@ The app is designed with multi layer MVVM architecture for better control over i
 ## How to pull the repository
 
 	git clone git@github.com:SembaMax/pixabay-images-app.git
-	gradle clean build
   
 
 ## Build Requirements

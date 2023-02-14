@@ -56,7 +56,8 @@ class MainActivity : ComponentActivity() {
                     ) {
                         PixabayNavHost(
                             navController = appState.navController,
-                            onBackClick = appState::onBackClick
+                            onBackClick = appState::onBackClick,
+                            navigateTo = appState::navigateToScreenDestination
                         )
 
                         val isOffline by appState.isOffline.collectAsState()

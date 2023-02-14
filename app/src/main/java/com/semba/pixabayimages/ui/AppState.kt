@@ -11,7 +11,7 @@ import com.semba.pixabayimages.feature.detailscreen.detailRoute
 import com.semba.pixabayimages.feature.detailscreen.navigateToDetailScreen
 import com.semba.pixabayimages.feature.searchscreen.navigateToSearchScreen
 import com.semba.pixabayimages.feature.searchscreen.searchRoute
-import com.semba.pixabayimages.navigation.ScreenDestination
+import com.semba.pixabayimages.core.design.navigation.ScreenDestination
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
@@ -41,7 +41,7 @@ class AppState(
             initialValue = false
         )
 
-    fun navigateToScreenDestination(topScreenDestination: ScreenDestination) {
+    fun navigateToScreenDestination(screenDestination: ScreenDestination, args: Map<String, String>) {
         val topLevelOptions = navOptions {
             popUpTo(navController.graph.findStartDestination().id) {
                 saveState = true
@@ -52,9 +52,9 @@ class AppState(
             // Restore state when re-selecting a previously selected item
             restoreState = true
 
-            when (topScreenDestination) {
+            when (screenDestination) {
                 ScreenDestination.SEARCH -> navController.navigateToSearchScreen()
-                ScreenDestination.DETAIL -> navController.navigateToDetailScreen()
+                ScreenDestination.DETAIL -> navController.navigateToDetailScreen(args)
             }
         }
     }

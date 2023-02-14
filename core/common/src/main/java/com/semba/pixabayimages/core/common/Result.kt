@@ -13,7 +13,8 @@ enum class ErrorCode (val code: Int) {
     NOT_FOUND(404),
     BAD_REQUEST(400),
     UNAUTHORIZED(401),
-    SERVER_ERROR(500);
+    SERVER_ERROR(500),
+    DATABASE_ERROR(1000);
 
     companion object {
         fun from(code: Int): ErrorCode = ErrorCode.values().first { it.code == code }

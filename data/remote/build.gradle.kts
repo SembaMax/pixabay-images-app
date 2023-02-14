@@ -10,7 +10,7 @@ android {
     val properties = Properties()
     properties.load(project.rootProject.file("local.properties").inputStream())
     defaultConfig {
-        buildConfigField("String", "PIXAPAY_API_KEY", "\"${properties.getProperty("PIXAPAY_API_KEY")}\"")
+        buildConfigField("String", "PIXABAY_API_KEY", "\"${properties.getProperty("PIXABAY_API_KEY")}\"")
     }
 
     buildFeatures {

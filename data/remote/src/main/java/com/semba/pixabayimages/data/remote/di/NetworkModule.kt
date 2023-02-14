@@ -41,7 +41,7 @@ object NetworkModule {
     private fun authorizationInterceptor() = Interceptor {
         val url: HttpUrl = it.request().url
             .newBuilder()
-            .addQueryParameter("key", BuildConfig.PIXAPAY_API_KEY)
+            .addQueryParameter("key", BuildConfig.PIXABAY_API_KEY)
             .build()
         val request: Request = it.request().newBuilder().url(url).build()
         it.proceed(request)

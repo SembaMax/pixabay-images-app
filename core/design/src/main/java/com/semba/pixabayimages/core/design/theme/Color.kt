@@ -24,4 +24,6 @@ val On_Error_Light = Color.White
 val On_Background_Dark = Color.White
 val On_Background_Light = Color.Black
 val On_Container = Color.LightGray
+val Surface_Dark = Color.Black
+val Surface_Light = Color.White
 val Outline = Color(red = 0f, green = 0f, blue = 0f, alpha = 0.4f)

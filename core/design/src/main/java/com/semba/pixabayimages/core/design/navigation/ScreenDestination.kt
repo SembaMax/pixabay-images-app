@@ -1,4 +1,4 @@
-package com.semba.pixabayimages.navigation
+package com.semba.pixabayimages.core.design.navigation
 
 enum class ScreenDestination {
     SEARCH,

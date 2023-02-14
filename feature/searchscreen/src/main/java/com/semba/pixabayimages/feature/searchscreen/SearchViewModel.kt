@@ -64,6 +64,14 @@ class SearchViewModel @Inject constructor(private val searchUseCase: SearchUseCa
             .launchIn(viewModelScope)
     }
 
+    fun showConfirmationDialog(imageItem: ImageItem) {
+        _uiState.value = _uiState.value.copy(currentClickedImage = imageItem, showDialog = true)
+    }
+
+    fun dismissConfirmationDialog() {
+        _uiState.value = _uiState.value.copy(currentClickedImage = ImageItem.empty(), showDialog = false)
+    }
+
     private fun increasePage() {
         _uiState.value = _uiState.value.copy(currentPage = getNextPage(_uiState.value.currentPage))
     }

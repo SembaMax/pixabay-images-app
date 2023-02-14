@@ -154,7 +154,7 @@ fun StatsViews(likes: Int, comments: Int, downloads: Int, views: Int) {
 
 @Composable
 fun StatItem(modifier: Modifier = Modifier, name: String, icon: Int, tint: Color = Color.White) {
-    Row(modifier = modifier, horizontalArrangement = Arrangement.SpaceAround, verticalAlignment = Alignment.CenterVertically) {
+    Row(modifier = modifier, horizontalArrangement = Arrangement.spacedBy(3.dp), verticalAlignment = Alignment.CenterVertically) {
         Icon(painter = painterResource(id = icon), contentDescription = null, modifier = Modifier.size(30.dp), tint = tint)
         Text(text = name, fontSize = 13.sp, color = MaterialTheme.colorScheme.onPrimaryContainer)
     }

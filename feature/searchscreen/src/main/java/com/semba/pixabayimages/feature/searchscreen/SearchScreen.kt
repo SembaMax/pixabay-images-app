@@ -34,6 +34,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -93,7 +94,6 @@ fun SearchScreen(navigateTo: (screenDestination: ScreenDestination, args: Map<St
 
     val viewModel: SearchViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val navController = rememberNavController()
     val queryState = remember { viewModel.queryState }
 
     Box(modifier = Modifier
@@ -111,8 +111,7 @@ fun SearchScreen(navigateTo: (screenDestination: ScreenDestination, args: Map<St
             gridState,
             uiState,
             loadMore = { viewModel.loadNextPage() },
-            onItemClick = { imageItem ->
-                navigateTo(ScreenDestination.DETAIL, imageItem.toArgs())})
+            onItemClick = { imageItem -> viewModel.showConfirmationDialog(imageItem) })
 
         CollapsingTopBar(modifier = Modifier
             .fillMaxWidth()
@@ -121,6 +120,14 @@ fun SearchScreen(navigateTo: (screenDestination: ScreenDestination, args: Map<St
             progress = toolbarState.progress,
             queryState = queryState,
             onSearchClick = { viewModel.onSearchClick() })
+
+        ConfirmationDialog(modifier = Modifier.align(Alignment.Center),
+            userName = uiState.currentClickedImage.user,
+            showDialog = uiState.showDialog,
+            onConfirm = {
+                viewModel.dismissConfirmationDialog()
+                navigateTo(ScreenDestination.DETAIL, uiState.currentClickedImage.toArgs()) },
+            onDismiss = { viewModel.dismissConfirmationDialog() })
     }
 }
 
@@ -237,10 +244,40 @@ fun ImagesGrid(modifier: Modifier = Modifier, gridState: LazyGridState = remembe
 }
 
 @Composable
+fun ConfirmationDialog(
+    modifier: Modifier = Modifier,
+    userName: String,
+    showDialog: Boolean,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    if (showDialog) {
+        AlertDialog(
+            modifier = modifier,
+            title = { Text(stringResource(DesignR.string.dialog_open_image_title, userName), fontSize = 15.sp, color = MaterialTheme.colorScheme.onBackground, lineHeight = 18.sp) },
+            onDismissRequest = onDismiss,
+            confirmButton = {
+                TextButton(onClick = onConfirm) {
+                    Text(text = stringResource(DesignR.string.yes))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = onDismiss) {
+                    Text(text = stringResource(DesignR.string.no))
+                }
+            }
+        )
+    }
+}
+
+@Composable
 fun LoadingItem() {
     Box() {
         CircularProgressIndicator(
-            modifier = Modifier.size(50.dp).padding(10.dp).align(Alignment.Center)
+            modifier = Modifier
+                .size(50.dp)
+                .padding(10.dp)
+                .align(Alignment.Center)
         )
     }
 }

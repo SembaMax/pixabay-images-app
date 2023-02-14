@@ -9,8 +9,8 @@ Search and preview images in both online and offline modes.
 ## App
 * Min. deployment target Android API 24
 * Kotlin source code
-* Offline handling
-* Multi module MVVM architecture
+* Offline data handling
+* Modular MVVM architecture
 
 
 ## Screenshots
@@ -29,6 +29,18 @@ Search and preview images in both online and offline modes.
 </p>
 
 
+
+## Clean Architecture
+The app is designed with multi layer MVVM architecture for better control over individual modules. Which makes the project open for scalability, and flexible to change, maintain and test.
+
+
+
+
+<p align="center">
+<img src="https://developer.android.com/static/topic/libraries/architecture/images/mad-arch-overview-ui.png" width="500" />
+</p>
+
+
 ## How to pull the repository
 
 	git clone git@github.com:SembaMax/pixabay-images-app.git
@@ -43,7 +55,7 @@ Search and preview images in both online and offline modes.
 
 ## Configuration
 
-1. Signup or Login into [Pixabay](https://pixabay.com/api/docs/#api_search_images) for getting API_KEY
+1. Login into [Pixabay](https://pixabay.com/api/docs/#api_search_images) for getting API_KEY
 2. Add `PIXABAY_API_KEY="Your_Api_Key"` to `local.properties` file.
 
 ```kotlin

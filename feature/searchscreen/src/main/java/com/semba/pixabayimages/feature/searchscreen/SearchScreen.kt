@@ -9,10 +9,13 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
@@ -24,33 +27,33 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
+import com.semba.pixabayimages.core.design.navigation.ScreenDestination
 import com.semba.pixabayimages.core.design.theme.TextField_Container_Color
 import com.semba.pixabayimages.data.model.search.ImageItem
 import com.semba.pixabayimages.feature.searchscreen.state.ScrollState
 import com.semba.pixabayimages.feature.searchscreen.state.SearchUiState
 import com.semba.pixabayimages.feature.searchscreen.state.TopBarState
 import kotlinx.coroutines.cancelChildren
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import com.semba.pixabayimages.core.design.R as DesignR
 
 private val MinTopBarHeight = 96.dp
 private val MaxTopBarHeight = 150.dp
 
 @OptIn(ExperimentalLifecycleComposeApi::class)
-@Preview
 @Composable
-fun SearchScreen() {
+fun SearchScreen(navigateTo: (screenDestination: ScreenDestination, args: Map<String, String>) -> Unit) {
 
     val toolbarHeightRange = with(LocalDensity.current) {
         MinTopBarHeight.roundToPx()..MaxTopBarHeight.roundToPx()
@@ -108,7 +111,8 @@ fun SearchScreen() {
             gridState,
             uiState,
             loadMore = { viewModel.loadNextPage() },
-            onItemClick = { imageItem -> })
+            onItemClick = { imageItem ->
+                navigateTo(ScreenDestination.DETAIL, imageItem.toArgs())})
 
         CollapsingTopBar(modifier = Modifier
             .fillMaxWidth()
@@ -121,9 +125,11 @@ fun SearchScreen() {
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun CollapsingTopBar(modifier: Modifier = Modifier, progress : Float = 0f, queryState: MutableState<String>, onSearchClick: () -> Unit) {
+
+    val keyboard = LocalSoftwareKeyboardController.current
 
     Surface(modifier = modifier) {
 
@@ -151,6 +157,16 @@ fun CollapsingTopBar(modifier: Modifier = Modifier, progress : Float = 0f, query
                     TextField(
                         value = queryState.value,
                         onValueChange = { queryState.value = it },
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Text,
+                            imeAction = ImeAction.Search
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onSearch = {
+                                keyboard?.hide()
+                                onSearchClick()
+                            }
+                        ),
                     modifier = Modifier.weight(0.8f),
                         colors = TextFieldDefaults.textFieldColors(
                             containerColor = TextField_Container_Color,

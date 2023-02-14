@@ -23,6 +23,13 @@ class ImageSearchRepository @Inject constructor(private val remoteDataSource: Ne
         emit(result)
     }
 
+    override fun loadImageItem(imageId: Long): Flow<Result<ImageItem>> = flow<Result<ImageItem>> {
+        val item = localDataSource.fetchImageItemWithId(imageId)
+        emit(Result.Success(item))
+    }.catch {
+        emit(Result.Failure(ErrorCode.DATABASE_ERROR))
+    }
+
     private suspend fun checkForRemoteData(query: String, pageIndex: Int): Result<List<ImageItem>> {
         val networkResult = remoteDataSource.fetchImagesWithQuery(query, pageIndex)
         return when (networkResult) {

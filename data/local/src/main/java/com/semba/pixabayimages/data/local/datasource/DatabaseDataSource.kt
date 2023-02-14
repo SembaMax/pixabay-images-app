@@ -28,4 +28,8 @@ class DatabaseDataSource @Inject constructor(private val searchImageDao: SearchI
             searchImageDao.insertSearchQueryImageCrossRef(SearchQueryImagesCrossRef(query, it.id))
         }
     }
+
+    override suspend fun fetchImageItemWithId(imageId: Long): ImageItem = withContext(Dispatchers.IO) {
+        searchImageDao.getImageOfId(imageId).toModel()
+    }
 }

@@ -1,5 +1,6 @@
 package com.semba.pixabayimages.feature.detailscreen
 
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -9,10 +10,7 @@ import androidx.compose.foundation.layout.R
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,49 +23,74 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
+import com.semba.pixabayimages.data.model.search.ImageItem
 import com.semba.pixabayimages.core.design.R as DesignR
 
+@OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun DetailScreen(
-    userName: String,
-    userImage: String,
-    imageUrl: String,
-    likes: Int,
-    comments: Int,
-    views: Int,
-    downloads: Int,
-    tags: ArrayList<String>,
+    imageId: Long
 ) {
 
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .background(MaterialTheme.colorScheme.surface)) {
-        DetailTopBar()
-        DetailImageSection(imageUrl, userName, userImage, likes, comments, downloads, views, tags)
+    val viewModel: DetailViewModel = hiltViewModel()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(key1 = true) {
+        viewModel.fetchImageItem(imageId)
     }
 
+    when (uiState) {
+        is DetailUiState.Error -> DetailContent(imageItem = ImageItem.empty()) //TODO: handle ui for error if required
+        DetailUiState.Loading -> DetailContent(imageItem = ImageItem.empty(), showLoading = true)
+        is DetailUiState.Success -> { DetailContent(imageItem = (uiState as DetailUiState.Success).imageItem) }
+    }
 }
 
 @Composable
-fun DetailTopBar() {
-    Box(modifier = Modifier.height(50.dp)) {
-        val navController = rememberNavController()
+fun DetailContent(imageItem: ImageItem, showLoading: Boolean = false, showError: Boolean = false) {
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .background(MaterialTheme.colorScheme.background))
+    {
+        Box(modifier = Modifier
+            .fillMaxSize()) {
+            DetailImageSection(imageItem)
+            DetailTopBar()
+        }
 
-        IconButton(onClick = { navController.popBackStack() }, modifier = Modifier
-            .size(40.dp)
-            .align(Alignment.CenterStart)) {
-            Icon(modifier = Modifier.size(40.dp), painter = painterResource(id = DesignR.drawable.ic_back), contentDescription = "back_button")
+        if (showLoading)
+        {
+            CircularProgressIndicator(modifier = Modifier
+                .size(50.dp)
+                .padding(10.dp)
+                .align(Alignment.Center))
         }
     }
 }
 
 @Composable
-fun DetailImageSection(imageUrl: String, userName: String, userImage: String, likes: Int, comments: Int, downloads: Int, views: Int, tags: ArrayList<String>) {
+fun DetailTopBar() {
+    Box(modifier = Modifier.padding(10.dp)) {
+        val dispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+
+        IconButton(onClick = { dispatcher?.onBackPressed() }, modifier = Modifier
+            .size(35.dp)
+            .align(Alignment.CenterStart)) {
+            Icon(modifier = Modifier.size(40.dp), painter = painterResource(id = DesignR.drawable.ic_back), contentDescription = "back_button", tint = MaterialTheme.colorScheme.onBackground)
+        }
+    }
+}
+
+@Composable
+fun DetailImageSection(imageItem: ImageItem) {
     Box(modifier = Modifier.fillMaxSize()) {
-        ImagePreview(imageUrl)
-        BottomDetailsSection(userName, userImage, likes, comments, downloads, views, tags)
+        ImagePreview(imageItem.fullHDURL)
+        BottomDetailsSection(modifier = Modifier.align(Alignment.BottomCenter), imageItem.user, imageItem.userImageURL, imageItem.likes, imageItem.comments, imageItem.downloads, imageItem.views, imageItem.tags)
     }
 }
 
@@ -90,8 +113,8 @@ fun ImagePreview(imageURL: String) {
             modifier = Modifier
                 .align(Alignment.Center)
                 .graphicsLayer(
-                    scaleX = maxOf(.5f, minOf(3f, scale)),
-                    scaleY = maxOf(.5f, minOf(3f, scale))
+                    scaleX = maxOf(1f, minOf(3f, scale)),
+                    scaleY = maxOf(1f, minOf(3f, scale))
                 ),
             model = imageURL,
             contentDescription = ""
@@ -100,16 +123,17 @@ fun ImagePreview(imageURL: String) {
 }
 
 @Composable
-fun BottomDetailsSection(userName: String, userImage: String, likes: Int, comments: Int, downloads: Int, views: Int, tags: ArrayList<String>) {
-    Column(modifier = Modifier
+fun BottomDetailsSection(modifier: Modifier = Modifier, userName: String, userImage: String, likes: Int, comments: Int, downloads: Int, views: Int, tags: String) {
+    Column(modifier = modifier
         .fillMaxWidth()
-        .padding(10.dp)
-        .height(100.dp)
-        .background(MaterialTheme.colorScheme.outline)) {
+        .background(MaterialTheme.colorScheme.outline),
+        horizontalAlignment = Alignment.Start,
+        verticalArrangement = Arrangement.SpaceAround
+    ) {
         StatsViews(likes, comments, downloads, views)
-        Spacer(modifier = Modifier.height(15.dp))
+        Spacer(modifier = Modifier.height(5.dp))
         UserProfile(userName, userImage)
-        Spacer(modifier = Modifier.height(25.dp))
+        Spacer(modifier = Modifier.height(5.dp))
         TagChips(tags)
     }
 }
@@ -117,8 +141,9 @@ fun BottomDetailsSection(userName: String, userImage: String, likes: Int, commen
 @Composable
 fun StatsViews(likes: Int, comments: Int, downloads: Int, views: Int) {
     Box(modifier = Modifier
+        .padding(5.dp)
         .fillMaxWidth()) {
-        Row(modifier = Modifier.align(Alignment.CenterStart), horizontalArrangement = Arrangement.SpaceAround, verticalAlignment = Alignment.CenterVertically) {
+        Row(modifier = Modifier.align(Alignment.CenterStart), horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
             StatItem(name = likes.toString(), icon = DesignR.drawable.ic_likes, tint = Color.Red)
             StatItem(name = comments.toString(), icon = DesignR.drawable.ic_comments)
             StatItem(name = downloads.toString(), icon = DesignR.drawable.ic_downloads)
@@ -131,15 +156,15 @@ fun StatsViews(likes: Int, comments: Int, downloads: Int, views: Int) {
 fun StatItem(modifier: Modifier = Modifier, name: String, icon: Int, tint: Color = Color.White) {
     Row(modifier = modifier, horizontalArrangement = Arrangement.SpaceAround, verticalAlignment = Alignment.CenterVertically) {
         Icon(painter = painterResource(id = icon), contentDescription = null, modifier = Modifier.size(30.dp), tint = tint)
-        Text(text = name, fontSize = 15.sp, color = MaterialTheme.colorScheme.onPrimaryContainer)
+        Text(text = name, fontSize = 13.sp, color = MaterialTheme.colorScheme.onPrimaryContainer)
     }
 }
 
 @Composable
 fun UserProfile(userName: String, userImage: String) {
-    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceAround) {
-        CircleImage(modifier = Modifier.weight(0.3f), image = userImage, size = 100.dp)
-        Text(text = userName)
+    Row(Modifier.wrapContentSize().padding(5.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        CircleImage(modifier = Modifier, image = userImage, size = 60.dp)
+        Text(text = userName, color = MaterialTheme.colorScheme.onPrimary, fontSize = 15.sp)
     }
 }
 
@@ -148,7 +173,7 @@ fun CircleImage(modifier: Modifier = Modifier, image: String, size: Dp) {
     Box(modifier = modifier
         .size(size)
         .aspectRatio(1f, matchHeightConstraintsFirst = true)
-        .border(1.dp, Color.LightGray, shape = CircleShape)
+        .border(1.dp, MaterialTheme.colorScheme.onPrimary, shape = CircleShape)
         .padding(3.dp))
     {
         AsyncImage(model = image, contentDescription = "CircleImage", Modifier.clip(
@@ -158,17 +183,23 @@ fun CircleImage(modifier: Modifier = Modifier, image: String, size: Dp) {
 }
 
 @Composable
-fun TagChips(tags: ArrayList<String>) {
-    LazyRow() {
+fun TagChips(tagsString: String) {
+    val tags by remember {
+        derivedStateOf {
+            tagsString.split(", ")
+        }
+    }
+    
+    LazyRow(contentPadding = PaddingValues(10.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
         items(tags.size) {
             Box(
                 modifier = Modifier
-                    .padding(3.dp, 5.dp, 3.dp, 5.dp)
-                    .clip(RoundedCornerShape(3.dp))
+                    .clip(RoundedCornerShape(7.dp))
                     .background(MaterialTheme.colorScheme.tertiary)
             )
             {
-                Text(text = tags[it], color = MaterialTheme.colorScheme.onTertiary, fontSize = 12.sp)
+                Text(modifier = Modifier
+                    .padding(5.dp, 5.dp, 5.dp, 5.dp), text = tags[it], color = MaterialTheme.colorScheme.onTertiary, fontSize = 13.sp)
             }
         }
     }

@@ -4,6 +4,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.semba.pixabayimages.core.common.ErrorCode
+import com.semba.pixabayimages.core.design.navigation.*
 import com.semba.pixabayimages.data.model.search.ImageItem
 import com.semba.pixabayimages.feature.searchscreen.domain.SearchUseCase
 import com.semba.pixabayimages.feature.searchscreen.state.ResultState
@@ -46,6 +47,7 @@ class SearchViewModel @Inject constructor(private val searchUseCase: SearchUseCa
                 when(result)
                 {
                     is ResultState.Success -> {
+                        checkIfLimitReached(result.imageItems)
                         _uiState.value = _uiState.value.copy(imageItems = _uiState.value.imageItems + result.imageItems)
                     }
                     is ResultState.Loading -> {
@@ -71,5 +73,14 @@ class SearchViewModel @Inject constructor(private val searchUseCase: SearchUseCa
         _uiState.value = _uiState.value.copy(limitReached = isLimitReached)
     }
 
+    private fun checkIfLimitReached(items: List<ImageItem>) {
+        val isLimitReached = items.isEmpty()
+        _uiState.value = _uiState.value.copy(limitReached = isLimitReached)
+    }
+
     private fun getNextPage(page: Int): Int = page + 1
 }
+
+fun ImageItem.toArgs(): Map<String,String> = mapOf(
+    IMAGE_ID_ARG to this.id.toString()
+)

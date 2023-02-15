@@ -50,7 +50,9 @@ The app is designed with multi layer MVVM architecture for better control over i
 
 - JDK11
 - Supports minimum API 24
+- Gradle 7.5.1+
 - Kotlin 1.7.21+
+- [Android Studio Electric Eel](https://developer.android.com/studio/)
 
 ## Configuration
 

@@ -9,6 +9,7 @@ Search and preview images in both online and offline modes.
 ## App
 * Min. deployment target Android API 24
 * Kotlin source code
+* Pagination
 * Offline data handling
 * Modular MVVM architecture
 

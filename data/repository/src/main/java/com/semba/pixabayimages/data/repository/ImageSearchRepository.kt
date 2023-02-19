@@ -2,17 +2,16 @@ package com.semba.pixabayimages.data.repository
 
 import com.semba.pixabayimages.core.common.ErrorCode
 import com.semba.pixabayimages.core.common.Result
-import com.semba.pixabayimages.core.common.connectivity.NetworkMonitor
 import com.semba.pixabayimages.data.model.search.ImageItem
-import com.semba.pixabayimages.data.local.datasource.DatabaseDataSource
-import com.semba.pixabayimages.data.remote.datasource.NetworkDataSource
+import com.semba.pixabayimages.data.local.datasource.LocalDataSource
+import com.semba.pixabayimages.data.remote.datasource.RemoteDataSource
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.*
 import timber.log.Timber
 import javax.inject.Inject
 
-class ImageSearchRepository @Inject constructor(private val remoteDataSource: NetworkDataSource,
-                                                private val localDataSource: DatabaseDataSource) : SearchRepository {
+class ImageSearchRepository @Inject constructor(private val remoteDataSource: RemoteDataSource,
+                                                private val localDataSource: LocalDataSource) : SearchRepository {
 
     override fun loadImages(query: String, pageIndex: Int): Flow<Result<List<ImageItem>>> = flow {
         var result = checkForRemoteData(query, pageIndex)

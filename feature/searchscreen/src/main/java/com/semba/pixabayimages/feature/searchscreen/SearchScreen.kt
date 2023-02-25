@@ -49,7 +49,7 @@ import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.launch
 import com.semba.pixabayimages.core.design.R as DesignR
 
-private val MinTopBarHeight = 96.dp
+private val MinTopBarHeight = 135.dp
 private val MaxTopBarHeight = 150.dp
 
 @OptIn(ExperimentalLifecycleComposeApi::class)

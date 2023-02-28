@@ -35,3 +35,12 @@ interface TopBarState {
     var scrollTopLimitReached: Boolean
     var scrollOffset: Float
 }
+
+data class ScaleAndAlphaArgs(
+    val fromScale: Float,
+    val toScale: Float,
+    val fromAlpha: Float,
+    val toAlpha: Float
+)
+
+enum class TransitionState { PLACING, PLACED }

@@ -1,12 +1,13 @@
 package com.semba.pixabayimages.feature.searchscreen
 
-import androidx.compose.animation.core.FloatExponentialDecaySpec
-import androidx.compose.animation.core.animateDecay
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -18,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -42,11 +44,10 @@ import androidx.navigation.compose.rememberNavController
 import com.semba.pixabayimages.core.design.navigation.ScreenDestination
 import com.semba.pixabayimages.core.design.theme.TextField_Container_Color
 import com.semba.pixabayimages.data.model.search.ImageItem
-import com.semba.pixabayimages.feature.searchscreen.state.ScrollState
-import com.semba.pixabayimages.feature.searchscreen.state.SearchUiState
-import com.semba.pixabayimages.feature.searchscreen.state.TopBarState
+import com.semba.pixabayimages.feature.searchscreen.state.*
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.launch
+import kotlin.math.absoluteValue
 import com.semba.pixabayimages.core.design.R as DesignR
 
 private val MinTopBarHeight = 135.dp
@@ -211,10 +212,9 @@ const val CELL_COUNT = 2
 @Composable
 fun ImagesGrid(modifier: Modifier = Modifier, gridState: LazyGridState = rememberLazyGridState(), uiState: SearchUiState, loadMore: () -> Unit, onItemClick: (ImageItem) -> Unit) {
 
-    val uiStateUpdated by rememberUpdatedState(newValue = uiState)
     val shouldLoadMore = remember {
         derivedStateOf {
-            !uiStateUpdated.isLoading && !uiStateUpdated.limitReached && (gridState.layoutInfo.visibleItemsInfo.lastOrNull()?.index
+            !uiState.isLoading && !uiState.limitReached && (gridState.layoutInfo.visibleItemsInfo.lastOrNull()?.index
                 ?: -100) >= (gridState.layoutInfo.totalItemsCount - 6)
         }
     }
@@ -231,11 +231,10 @@ fun ImagesGrid(modifier: Modifier = Modifier, gridState: LazyGridState = remembe
         verticalArrangement = Arrangement.spacedBy(10.dp),
         horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        items(uiStateUpdated.imageItems.size) {
-            ImageGridItem(modifier = Modifier.clickable { onItemClick(uiStateUpdated.imageItems[it]) }, item = uiStateUpdated.imageItems[it])
-        }
 
-        if (uiStateUpdated.isLoading) {
+        imagesGridContent(uiState.imageItems, CELL_COUNT, gridState, onItemClick)
+
+        if (uiState.isLoading) {
             item(span = { GridItemSpan(CELL_COUNT) }) {
                 LoadingItem()
             }
@@ -287,4 +286,36 @@ private fun rememberToolbarState(toolbarHeightRange: IntRange): TopBarState {
     return rememberSaveable(saver = ScrollState.Saver) {
         ScrollState(toolbarHeightRange)
     }
+}
+
+private fun LazyGridScope.imagesGridContent(images: List<ImageItem>, columns: Int, state: LazyGridState, onItemClick: (ImageItem) -> Unit) {
+    items(images.count()) { index ->
+        val animation = tween<Float>(durationMillis = 500, delayMillis = 100, easing = LinearOutSlowInEasing)
+        val args = ScaleAndAlphaArgs(fromScale = 2f, toScale = 1f, fromAlpha = 0f, toAlpha = 1f)
+        val (scale, alpha) = scaleAndAlpha(args = args, animation = animation)
+        val imageItem = images[index]
+        ImageGridItem(modifier = Modifier.clickable { onItemClick(imageItem) }.graphicsLayer(alpha = alpha, scaleX = scale, scaleY = scale), item = imageItem)
+    }
+}
+
+@Composable
+fun scaleAndAlpha(
+    args: ScaleAndAlphaArgs,
+    animation: FiniteAnimationSpec<Float>
+): Pair<Float, Float> {
+    val transitionState = remember { MutableTransitionState(TransitionState.PLACING).apply { targetState = TransitionState.PLACED } }
+    val transition = updateTransition(transitionState, label = "")
+    val alpha by transition.animateFloat(transitionSpec = { animation }, label = "") { state ->
+        when (state) {
+            TransitionState.PLACING -> args.fromAlpha
+            TransitionState.PLACED -> args.toAlpha
+        }
+    }
+    val scale by transition.animateFloat(transitionSpec = { animation }, label = "") { state ->
+        when (state) {
+            TransitionState.PLACING -> args.fromScale
+            TransitionState.PLACED -> args.toScale
+        }
+    }
+    return alpha to scale
 }

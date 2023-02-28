@@ -17,7 +17,7 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
             val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")
             extensions.configure<LibraryExtension> {
                 defaultConfig {
-
+                    testInstrumentationRunner = "com.semba.pixabayimages.core.testing.AppTestRunner"
                 }
 
                 buildFeatures {
@@ -26,6 +26,12 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
 
                 composeOptions {
                     kotlinCompilerExtensionVersion = libs.findVersion("androidxComposeCompiler").get().toString()
+                }
+
+                packagingOptions {
+                    resources {
+                        excludes += "/META-INF/{AL2.0,LGPL2.1,*.md}"
+                    }
                 }
             }
 

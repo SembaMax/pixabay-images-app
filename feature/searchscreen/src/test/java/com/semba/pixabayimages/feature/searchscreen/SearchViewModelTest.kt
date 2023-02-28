@@ -1,4 +1,4 @@
-package com.semba.feature.searchscreen
+package com.semba.pixabayimages.feature.searchscreen
 
 import com.semba.pixabayimages.core.common.ErrorCode
 import com.semba.pixabayimages.core.common.errorMessage

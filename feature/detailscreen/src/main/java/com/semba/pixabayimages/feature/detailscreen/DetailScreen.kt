@@ -74,7 +74,9 @@ fun DetailContent(imageItem: ImageItem = ImageItem.empty(), showLoading: Boolean
 
         if (showLoading)
         {
-            LoadingView(modifier = Modifier.align(Alignment.Center))
+            LoadingView(modifier = Modifier.align(Alignment.Center),
+                    size = 50.dp,
+                showText = true)
         }
 
         if (showError)

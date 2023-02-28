@@ -30,6 +30,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -41,6 +42,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
+import com.semba.pixabayimages.core.design.component.ErrorView
+import com.semba.pixabayimages.core.design.component.LoadingView
 import com.semba.pixabayimages.core.design.navigation.ScreenDestination
 import com.semba.pixabayimages.core.design.theme.TextField_Container_Color
 import com.semba.pixabayimages.data.model.search.ImageItem
@@ -64,7 +67,11 @@ fun SearchRoute(modifier: Modifier = Modifier, viewModel: SearchViewModel = hilt
 }
 
 @Composable
-fun SearchScreen(uiState: SearchUiState, modifier: Modifier = Modifier, queryState: String = "", navigateTo: (screenDestination: ScreenDestination, args: Map<String, String>) -> Unit, contract: SearchScreenContract? = null) {
+fun SearchScreen(uiState: SearchUiState,
+                 modifier: Modifier = Modifier,
+                 queryState: String = "",
+                 navigateTo: (screenDestination: ScreenDestination, args: Map<String, String>) -> Unit = {_,_->},
+                 contract: SearchScreenContract? = null) {
 
     val toolbarHeightRange = with(LocalDensity.current) {
         MinTopBarHeight.roundToPx()..MaxTopBarHeight.roundToPx()
@@ -225,13 +232,21 @@ fun ImagesGrid(modifier: Modifier = Modifier, gridState: LazyGridState = remembe
         }
     }
 
+    val shouldShowError by remember {
+        derivedStateOf {
+            !uiState.errorMsg.isNullOrEmpty() && uiState.imageItems.isNullOrEmpty()
+        }
+    }
+
     LaunchedEffect(key1 = shouldLoadMore.value) {
         if (shouldLoadMore.value)
             loadMore()
     }
 
     LazyVerticalGrid(
-        modifier = modifier.padding(start = 7.dp, end = 7.dp, bottom = 7.dp, top = 7.dp),
+        modifier = modifier
+            .padding(start = 7.dp, end = 7.dp, bottom = 7.dp, top = 7.dp)
+            .testTag("search_images_grid"),
         state = gridState,
         columns = GridCells.Fixed(CELL_COUNT),
         verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -243,6 +258,13 @@ fun ImagesGrid(modifier: Modifier = Modifier, gridState: LazyGridState = remembe
         if (uiState.isLoading) {
             item(span = { GridItemSpan(CELL_COUNT) }) {
                 LoadingItem()
+            }
+        }
+
+        if (shouldShowError)
+        {
+            item(span = { GridItemSpan(CELL_COUNT) }) {
+                ErrorItem()
             }
         }
     }
@@ -278,12 +300,21 @@ fun ConfirmationDialog(
 @Composable
 fun LoadingItem() {
     Box() {
-        CircularProgressIndicator(
+        LoadingView(
             modifier = Modifier
-                .size(50.dp)
                 .padding(10.dp)
-                .align(Alignment.Center)
+                .align(Alignment.Center),
+            size = 40.dp,
+            showText = false
         )
+    }
+}
+
+@Composable
+fun ErrorItem() {
+    Box {
+        ErrorView(modifier = Modifier
+            .align(Alignment.Center))
     }
 }
 

@@ -44,6 +44,7 @@ import androidx.navigation.compose.rememberNavController
 import com.semba.pixabayimages.core.design.navigation.ScreenDestination
 import com.semba.pixabayimages.core.design.theme.TextField_Container_Color
 import com.semba.pixabayimages.data.model.search.ImageItem
+import com.semba.pixabayimages.feature.searchscreen.domain.SearchScreenContract
 import com.semba.pixabayimages.feature.searchscreen.state.*
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.launch
@@ -55,7 +56,15 @@ private val MaxTopBarHeight = 150.dp
 
 @OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
-fun SearchScreen(navigateTo: (screenDestination: ScreenDestination, args: Map<String, String>) -> Unit) {
+fun SearchRoute(modifier: Modifier = Modifier, viewModel: SearchViewModel = hiltViewModel(), navigateTo: (screenDestination: ScreenDestination, args: Map<String, String>) -> Unit) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val queryState by viewModel.queryState.collectAsStateWithLifecycle()
+
+    SearchScreen(uiState = uiState, modifier = modifier, queryState = queryState, navigateTo = navigateTo, contract = viewModel)
+}
+
+@Composable
+fun SearchScreen(uiState: SearchUiState, modifier: Modifier = Modifier, queryState: String = "", navigateTo: (screenDestination: ScreenDestination, args: Map<String, String>) -> Unit, contract: SearchScreenContract? = null) {
 
     val toolbarHeightRange = with(LocalDensity.current) {
         MinTopBarHeight.roundToPx()..MaxTopBarHeight.roundToPx()
@@ -93,11 +102,7 @@ fun SearchScreen(navigateTo: (screenDestination: ScreenDestination, args: Map<St
         }
     }
 
-    val viewModel: SearchViewModel = hiltViewModel()
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val queryState = remember { viewModel.queryState }
-
-    Box(modifier = Modifier
+    Box(modifier = modifier
         .nestedScroll(nestedScrollConnection)
         .background(MaterialTheme.colorScheme.background)) {
         ImagesGrid(
@@ -111,8 +116,8 @@ fun SearchScreen(navigateTo: (screenDestination: ScreenDestination, args: Map<St
                 },
             gridState,
             uiState,
-            loadMore = { viewModel.loadNextPage() },
-            onItemClick = { imageItem -> viewModel.showConfirmationDialog(imageItem) })
+            loadMore = { contract?.loadNextPage() },
+            onItemClick = { imageItem -> contract?.showConfirmationDialog(imageItem) })
 
         CollapsingTopBar(modifier = Modifier
             .fillMaxWidth()
@@ -120,22 +125,23 @@ fun SearchScreen(navigateTo: (screenDestination: ScreenDestination, args: Map<St
             .graphicsLayer { translationY = toolbarState.offset },
             progress = toolbarState.progress,
             queryState = queryState,
-            onSearchClick = { viewModel.onSearchClick() })
+            onSearchClick = { contract?.onSearchClick() },
+            updateQuery = {query -> contract?.updateQuery(query)})
 
         ConfirmationDialog(modifier = Modifier.align(Alignment.Center),
             userName = uiState.currentClickedImage.user,
             showDialog = uiState.showDialog,
             onConfirm = {
-                viewModel.dismissConfirmationDialog()
+                contract?.dismissConfirmationDialog()
                 navigateTo(ScreenDestination.DETAIL, uiState.currentClickedImage.toArgs()) },
-            onDismiss = { viewModel.dismissConfirmationDialog() })
+            onDismiss = { contract?.dismissConfirmationDialog() })
     }
 }
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
-fun CollapsingTopBar(modifier: Modifier = Modifier, progress : Float = 0f, queryState: MutableState<String>, onSearchClick: () -> Unit) {
+fun CollapsingTopBar(modifier: Modifier = Modifier, progress : Float = 0f, queryState: String, onSearchClick: () -> Unit, updateQuery: (String) -> Unit) {
 
     val keyboard = LocalSoftwareKeyboardController.current
 
@@ -163,8 +169,8 @@ fun CollapsingTopBar(modifier: Modifier = Modifier, progress : Float = 0f, query
                     horizontalArrangement = Arrangement.SpaceAround
                 ) {
                     TextField(
-                        value = queryState.value,
-                        onValueChange = { queryState.value = it },
+                        value = queryState,
+                        onValueChange = { updateQuery(it) },
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Text,
                             imeAction = ImeAction.Search
@@ -294,7 +300,9 @@ private fun LazyGridScope.imagesGridContent(images: List<ImageItem>, columns: In
         val args = ScaleAndAlphaArgs(fromScale = 2f, toScale = 1f, fromAlpha = 0f, toAlpha = 1f)
         val (scale, alpha) = scaleAndAlpha(args = args, animation = animation)
         val imageItem = images[index]
-        ImageGridItem(modifier = Modifier.clickable { onItemClick(imageItem) }.graphicsLayer(alpha = alpha, scaleX = scale, scaleY = scale), item = imageItem)
+        ImageGridItem(modifier = Modifier
+            .clickable { onItemClick(imageItem) }
+            .graphicsLayer(alpha = alpha, scaleX = scale, scaleY = scale), item = imageItem)
     }
 }
 

@@ -15,7 +15,7 @@ fun NavController.navigateToSearchScreen(navOptions: NavOptions? = null) {
 
 fun NavGraphBuilder.searchScreen(navigateTo: (screenDestination: ScreenDestination, args: Map<String, String>) -> Unit) {
     composable(route = searchRoute) {
-        SearchScreen(navigateTo)
+        SearchRoute(navigateTo = navigateTo)
     }
 }
 

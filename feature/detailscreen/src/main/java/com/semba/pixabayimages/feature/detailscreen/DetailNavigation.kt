@@ -14,13 +14,12 @@ fun NavController.navigateToDetailScreen(args: Map<String, String>, navOptions: 
 private val args = listOf(
     navArgument(IMAGE_ID_ARG) {
         type = NavType.LongType
-
     },
 )
 
 fun NavGraphBuilder.detailScreen() {
     composable(route = detailRoute, arguments = args) { navBackStackEntry ->
         val imageId = navBackStackEntry.arguments?.getLong(IMAGE_ID_ARG) ?: 0L
-        DetailScreen(imageId)
+        DetailRoute(imageId = imageId)
     }
 }

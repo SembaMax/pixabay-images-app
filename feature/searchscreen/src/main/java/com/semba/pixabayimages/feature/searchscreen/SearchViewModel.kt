@@ -7,6 +7,7 @@ import com.semba.pixabayimages.core.common.ErrorCode
 import com.semba.pixabayimages.core.common.errorMessage
 import com.semba.pixabayimages.core.design.navigation.*
 import com.semba.pixabayimages.data.model.search.ImageItem
+import com.semba.pixabayimages.feature.searchscreen.domain.SearchScreenContract
 import com.semba.pixabayimages.feature.searchscreen.domain.SearchUseCase
 import com.semba.pixabayimages.feature.searchscreen.state.ResultState
 import com.semba.pixabayimages.feature.searchscreen.state.SearchUiState
@@ -16,7 +17,8 @@ import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 @HiltViewModel
-class SearchViewModel @Inject constructor(private val searchUseCase: SearchUseCase) : ViewModel() {
+class SearchViewModel @Inject constructor(private val searchUseCase: SearchUseCase) : ViewModel(),
+    SearchScreenContract {
 
     private val _uiState = MutableStateFlow(SearchUiState())
 
@@ -26,18 +28,23 @@ class SearchViewModel @Inject constructor(private val searchUseCase: SearchUseCa
         SearchUiState()
     )
 
-    val queryState = mutableStateOf("fruits")
+    private val _queryState = MutableStateFlow("fruits")
+    val queryState = _queryState.asStateFlow().stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        "fruits"
+    )
 
     init {
         searchQuery(queryState.value, _uiState.value.currentPage)
     }
 
-    fun onSearchClick() {
+    override fun onSearchClick() {
         _uiState.reset()
         searchQuery(queryState.value, _uiState.value.currentPage)
     }
 
-    fun loadNextPage() {
+    override fun loadNextPage() {
         increasePage()
         searchQuery(queryState.value, _uiState.value.currentPage)
     }
@@ -64,12 +71,16 @@ class SearchViewModel @Inject constructor(private val searchUseCase: SearchUseCa
             .launchIn(viewModelScope)
     }
 
-    fun showConfirmationDialog(imageItem: ImageItem) {
+    override fun showConfirmationDialog(imageItem: ImageItem) {
         _uiState.value = _uiState.value.copy(currentClickedImage = imageItem, showDialog = true)
     }
 
-    fun dismissConfirmationDialog() {
+    override fun dismissConfirmationDialog() {
         _uiState.value = _uiState.value.copy(currentClickedImage = ImageItem.empty(), showDialog = false)
+    }
+
+    override fun updateQuery(query: String) {
+        _queryState.value = query
     }
 
     private fun increasePage() {

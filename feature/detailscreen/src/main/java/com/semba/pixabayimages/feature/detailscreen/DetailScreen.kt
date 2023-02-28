@@ -28,31 +28,40 @@ import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
+import com.semba.pixabayimages.core.design.component.ErrorView
+import com.semba.pixabayimages.core.design.component.LoadingView
 import com.semba.pixabayimages.data.model.search.ImageItem
 import com.semba.pixabayimages.core.design.R as DesignR
 
 @OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
-fun DetailScreen(
-    imageId: Long
-) {
+fun DetailRoute(modifier: Modifier = Modifier, viewModel: DetailViewModel = hiltViewModel(), imageId: Long) {
 
-    val viewModel: DetailViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(key1 = true) {
         viewModel.fetchImageItem(imageId)
     }
 
-    when (uiState) {
-        is DetailUiState.Error -> DetailContent(imageItem = ImageItem.empty()) //TODO: handle ui for error if required
-        DetailUiState.Loading -> DetailContent(imageItem = ImageItem.empty(), showLoading = true)
-        is DetailUiState.Success -> { DetailContent(imageItem = (uiState as DetailUiState.Success).imageItem) }
+    DetailScreen(modifier = modifier, uiState = uiState)
+}
+
+@Composable
+fun DetailScreen(modifier: Modifier = Modifier, uiState: DetailUiState) {
+    Box(modifier = modifier.fillMaxSize()) {
+        when (uiState) {
+            is DetailUiState.Error -> DetailContent(showError = true)
+            DetailUiState.Loading -> DetailContent(showLoading = true)
+            is DetailUiState.Success -> {
+                DetailContent(imageItem = uiState.imageItem)
+            }
+        }
     }
 }
 
 @Composable
-fun DetailContent(imageItem: ImageItem, showLoading: Boolean = false, showError: Boolean = false) {
+fun DetailContent(imageItem: ImageItem = ImageItem.empty(), showLoading: Boolean = false, showError: Boolean = false) {
+
     Box(modifier = Modifier
         .fillMaxSize()
         .background(MaterialTheme.colorScheme.background))
@@ -65,10 +74,12 @@ fun DetailContent(imageItem: ImageItem, showLoading: Boolean = false, showError:
 
         if (showLoading)
         {
-            CircularProgressIndicator(modifier = Modifier
-                .size(50.dp)
-                .padding(10.dp)
-                .align(Alignment.Center))
+            LoadingView(modifier = Modifier.align(Alignment.Center))
+        }
+
+        if (showError)
+        {
+            ErrorView(modifier = Modifier.align(Alignment.Center))
         }
     }
 }
@@ -162,7 +173,10 @@ fun StatItem(modifier: Modifier = Modifier, name: String, icon: Int, tint: Color
 
 @Composable
 fun UserProfile(userName: String, userImage: String) {
-    Row(Modifier.wrapContentSize().padding(5.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+    Row(
+        Modifier
+            .wrapContentSize()
+            .padding(5.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
         CircleImage(modifier = Modifier, image = userImage, size = 60.dp)
         Text(text = userName, color = MaterialTheme.colorScheme.onPrimary, fontSize = 15.sp)
     }

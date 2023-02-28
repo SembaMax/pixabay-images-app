@@ -1,11 +1,11 @@
 package com.semba.pixabayimages.core.common
 
-sealed class Result<T>(
+sealed class DataResponse<T>(
     val data: T? = null,
     val errorCode: ErrorCode? = null
 ) {
-    class Success<T>(data: T) : Result<T>(data = data, errorCode = null)
-    class Failure<T>(errorCode: ErrorCode?) : Result<T>(data = null, errorCode = errorCode)
+    class Success<T>(data: T) : DataResponse<T>(data = data, errorCode = null)
+    class Failure<T>(errorCode: ErrorCode?) : DataResponse<T>(data = null, errorCode = errorCode)
 }
 
 enum class ErrorCode (val code: Int) {
@@ -19,4 +19,9 @@ enum class ErrorCode (val code: Int) {
     companion object {
         fun from(code: Int): ErrorCode = ErrorCode.values().first { it.code == code }
     }
+}
+
+//Todo: as a potential feature -> map here the corresponding error msg.
+fun ErrorCode.errorMessage(): String {
+    return "Error"
 }

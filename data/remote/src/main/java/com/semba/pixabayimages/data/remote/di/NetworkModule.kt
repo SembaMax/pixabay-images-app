@@ -11,6 +11,7 @@ import dagger.hilt.components.SingletonComponent
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import okhttp3.HttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -22,12 +23,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
-
-    @Provides
-    @Singleton
-    fun providesJson(): Json = Json {
-        ignoreUnknownKeys = true
-    }
 
     @Provides
     @Singleton
@@ -54,16 +49,22 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun providesRetrofitService(okHttpClient: OkHttpClient, json: Json): PixabayNetworkService {
+    fun providesRetrofitService(okHttpClient: OkHttpClient): PixabayNetworkService = apiService(Routes.BASE_URL.toHttpUrl(), okHttpClient)
+}
 
-        return Retrofit.Builder()
-            .baseUrl(Routes.BASE_URL)
-            .client(okHttpClient)
-            .addConverterFactory(
-                @OptIn(ExperimentalSerializationApi::class)
-                json.asConverterFactory("application/json".toMediaType())
-            )
-            .build()
-            .create(PixabayNetworkService::class.java)
+fun apiService(baseUrl: HttpUrl, okHttpClient: OkHttpClient): PixabayNetworkService
+{
+    val json = Json {
+        ignoreUnknownKeys = true
     }
+
+    return Retrofit.Builder()
+        .baseUrl(baseUrl)
+        .client(okHttpClient)
+        .addConverterFactory(
+            @OptIn(ExperimentalSerializationApi::class)
+            json.asConverterFactory("application/json".toMediaType())
+        )
+        .build()
+        .create(PixabayNetworkService::class.java)
 }

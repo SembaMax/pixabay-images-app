@@ -1,5 +1,6 @@
 plugins {
     id("pixabayimages.android.library")
+    alias(libs.plugins.kotlinx.serialization)
 }
 
 android {
@@ -12,5 +13,5 @@ android {
 }
 
 dependencies {
-
+    implementation(libs.kotlinx.serialization)
 }

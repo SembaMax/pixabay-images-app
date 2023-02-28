@@ -1,4 +1,4 @@
-package com.semba.pixabayimages.data.remote.model
+package com.semba.pixabayimages.data.model.search.network
 
 import com.semba.pixabayimages.data.model.search.ImageItem
 import kotlinx.serialization.SerialName

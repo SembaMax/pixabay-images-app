@@ -5,7 +5,7 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import com.semba.pixabayimages.core.design.theme.PixabayImagesTheme
 import com.semba.pixabayimages.data.model.search.ImageItem
-import com.semba.pixabayimages.feature.searchscreen.SearchScreen
+import com.semba.pixabayimages.data.model.search.TestTags
 import com.semba.pixabayimages.feature.searchscreen.state.SearchUiState
 import com.semba.pixabayimages.core.design.R as DesignR
 import org.junit.Before
@@ -34,7 +34,7 @@ class SearchScreenTest {
             }
         }
 
-        composeTestRule.onNodeWithTag("loading_view").assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TestTags.LOADING_TEST_TAG).assertIsDisplayed()
     }
 
     @Test
@@ -47,7 +47,7 @@ class SearchScreenTest {
             }
         }
 
-        composeTestRule.onNodeWithTag("error_view").assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TestTags.ERROR_TEST_TAG).assertIsDisplayed()
     }
 
     @Test
@@ -60,9 +60,9 @@ class SearchScreenTest {
             }
         }
 
-        composeTestRule.onNodeWithTag("error_view").assertDoesNotExist()
-        composeTestRule.onNodeWithTag("loading_view").assertDoesNotExist()
-        composeTestRule.onNodeWithTag("search_images_grid").assertExists()
+        composeTestRule.onNodeWithTag(TestTags.ERROR_TEST_TAG).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(TestTags.LOADING_TEST_TAG).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(TestTags.SEARCH_GRID_TEST_TAG).assertExists()
     }
 
     @Test
@@ -75,8 +75,8 @@ class SearchScreenTest {
             }
         }
 
-        val firstItem = composeTestRule.onNodeWithTag("search_images_grid").onChildAt(0)
-        val secondItem = composeTestRule.onNodeWithTag("search_images_grid").onChildAt(1)
+        val firstItem = composeTestRule.onNodeWithTag(TestTags.SEARCH_GRID_TEST_TAG).onChildAt(0)
+        val secondItem = composeTestRule.onNodeWithTag(TestTags.SEARCH_GRID_TEST_TAG).onChildAt(1)
 
         firstItem.assertIsDisplayed()
         firstItem.assert(hasText("user1"))
@@ -180,7 +180,6 @@ class SearchScreenTest {
             user = "user6",
             userImageURL = "userImageURL"
         ),
-
     )
 
 }

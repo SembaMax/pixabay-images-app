@@ -31,6 +31,7 @@ import coil.compose.AsyncImage
 import com.semba.pixabayimages.core.design.component.ErrorView
 import com.semba.pixabayimages.core.design.component.LoadingView
 import com.semba.pixabayimages.data.model.search.ImageItem
+import com.semba.pixabayimages.data.model.search.TestTags
 import com.semba.pixabayimages.core.design.R as DesignR
 
 @OptIn(ExperimentalLifecycleComposeApi::class)
@@ -94,7 +95,7 @@ fun DetailTopBar() {
         IconButton(onClick = { dispatcher?.onBackPressed() }, modifier = Modifier
             .size(35.dp)
             .align(Alignment.CenterStart)) {
-            Icon(modifier = Modifier.size(40.dp), painter = painterResource(id = DesignR.drawable.ic_back), contentDescription = "back_button", tint = MaterialTheme.colorScheme.onBackground)
+            Icon(modifier = Modifier.size(40.dp), painter = painterResource(id = DesignR.drawable.ic_back), contentDescription = TestTags.DETAIL_BACK_TEST_TAG, tint = MaterialTheme.colorScheme.onBackground)
         }
     }
 }
@@ -202,7 +203,7 @@ fun CircleImage(modifier: Modifier = Modifier, image: String, size: Dp) {
 fun TagChips(tagsString: String) {
     val tags by remember {
         derivedStateOf {
-            tagsString.split(", ")
+            tagsString.splitTagsString()
         }
     }
     

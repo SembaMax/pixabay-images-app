@@ -71,12 +71,12 @@ class SearchViewModel @Inject constructor(private val searchUseCase: SearchUseCa
             .launchIn(viewModelScope)
     }
 
-    override fun showConfirmationDialog(imageItem: ImageItem) {
-        _uiState.value = _uiState.value.copy(currentClickedImage = imageItem, showDialog = true)
+    override fun onImageItemClicked(imageItem: ImageItem) {
+        _uiState.value = _uiState.value.copy(currentClickedImage = imageItem)
     }
 
-    override fun dismissConfirmationDialog() {
-        _uiState.value = _uiState.value.copy(currentClickedImage = ImageItem.empty(), showDialog = false)
+    override fun removeImageItemClicked() {
+        _uiState.value = _uiState.value.copy(currentClickedImage = ImageItem.empty())
     }
 
     override fun updateQuery(query: String) {

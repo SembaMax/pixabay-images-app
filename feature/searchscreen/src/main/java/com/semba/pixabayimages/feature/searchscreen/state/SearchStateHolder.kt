@@ -17,7 +17,6 @@ data class SearchUiState(
     val imageItems: List<ImageItem> = emptyList(),
     val limitReached: Boolean = false,
     val isLoading: Boolean = false,
-    val showDialog: Boolean = false,
     val currentClickedImage: ImageItem = ImageItem.empty(),
     val errorMsg: String? = null
 )

@@ -28,6 +28,8 @@ class DetailViewModel @Inject constructor(private val getImageItemUseCase: GetIm
     }
 }
 
+fun String.splitTagsString(): List<String> = this.split(", ")
+
 sealed interface DetailUiState {
     object Loading: DetailUiState
     data class Success(val imageItem: ImageItem): DetailUiState

@@ -14,12 +14,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.semba.pixabayimages.core.design.R
+import com.semba.pixabayimages.data.model.search.TestTags
 
 @Composable
 fun ErrorView(modifier: Modifier = Modifier) {
     Column(
         modifier = modifier.
-        testTag("error_view"),
+        testTag(TestTags.ERROR_TEST_TAG),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceAround
     ) {

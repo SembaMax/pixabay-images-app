@@ -1,13 +1,11 @@
 package com.semba.pixabayimages.feature.searchscreen
 
 import androidx.compose.animation.core.*
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -19,7 +17,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -41,17 +38,16 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.compose.rememberNavController
 import com.semba.pixabayimages.core.design.component.ErrorView
 import com.semba.pixabayimages.core.design.component.LoadingView
 import com.semba.pixabayimages.core.design.navigation.ScreenDestination
 import com.semba.pixabayimages.core.design.theme.TextField_Container_Color
 import com.semba.pixabayimages.data.model.search.ImageItem
+import com.semba.pixabayimages.data.model.search.TestTags
 import com.semba.pixabayimages.feature.searchscreen.domain.SearchScreenContract
 import com.semba.pixabayimages.feature.searchscreen.state.*
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.launch
-import kotlin.math.absoluteValue
 import com.semba.pixabayimages.core.design.R as DesignR
 
 private val MinTopBarHeight = 135.dp
@@ -80,6 +76,8 @@ fun SearchScreen(uiState: SearchUiState,
     val gridState = rememberLazyGridState()
 
     val scope = rememberCoroutineScope()
+
+    var showDialog by remember { mutableStateOf(false) }
 
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
@@ -124,7 +122,10 @@ fun SearchScreen(uiState: SearchUiState,
             gridState,
             uiState,
             loadMore = { contract?.loadNextPage() },
-            onItemClick = { imageItem -> contract?.showConfirmationDialog(imageItem) })
+            onItemClick = { imageItem ->
+                showDialog = true
+                contract?.onImageItemClicked(imageItem)
+            })
 
         CollapsingTopBar(modifier = Modifier
             .fillMaxWidth()
@@ -137,11 +138,15 @@ fun SearchScreen(uiState: SearchUiState,
 
         ConfirmationDialog(modifier = Modifier.align(Alignment.Center),
             userName = uiState.currentClickedImage.user,
-            showDialog = uiState.showDialog,
+            showDialog = showDialog,
             onConfirm = {
-                contract?.dismissConfirmationDialog()
+                showDialog = false
+                contract?.removeImageItemClicked()
                 navigateTo(ScreenDestination.DETAIL, uiState.currentClickedImage.toArgs()) },
-            onDismiss = { contract?.dismissConfirmationDialog() })
+            onDismiss = {
+                showDialog = false
+                contract?.removeImageItemClicked()
+            })
     }
 }
 
@@ -246,7 +251,7 @@ fun ImagesGrid(modifier: Modifier = Modifier, gridState: LazyGridState = remembe
     LazyVerticalGrid(
         modifier = modifier
             .padding(start = 7.dp, end = 7.dp, bottom = 7.dp, top = 7.dp)
-            .testTag("search_images_grid"),
+            .testTag(TestTags.SEARCH_GRID_TEST_TAG),
         state = gridState,
         columns = GridCells.Fixed(CELL_COUNT),
         verticalArrangement = Arrangement.spacedBy(10.dp),

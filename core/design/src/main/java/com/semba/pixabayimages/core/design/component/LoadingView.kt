@@ -12,13 +12,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.semba.pixabayimages.core.design.R
+import com.semba.pixabayimages.data.model.search.TestTags
 
 @Composable
 fun LoadingView(modifier: Modifier = Modifier, size: Dp = 50.dp, showText: Boolean = true) {
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.SpaceAround) {
         CircularProgressIndicator(modifier = Modifier.
         size(size).
-        testTag("loading_view"))
+        testTag(TestTags.LOADING_TEST_TAG))
         if (showText) {
             Text(
                 text = stringResource(id = R.string.loading),

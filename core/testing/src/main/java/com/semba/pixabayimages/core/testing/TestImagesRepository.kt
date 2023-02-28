@@ -30,7 +30,7 @@ class TestImagesRepository: SearchRepository {
 
     override fun loadImageItem(imageId: Long): Flow<DataResponse<ImageItem>> {
         return if (shouldSuccess)
-            imagesFlow.map { images -> DataResponse.Success(data = images.first().toModel()) }
+            imagesFlow.map { images -> DataResponse.Success(data = images.first{ it.id == imageId }.toModel()) }
         else
             flow { emit(DataResponse.Failure(errorCode = error)) }
     }

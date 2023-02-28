@@ -6,6 +6,12 @@ Images search engine based on Pixabay API.
 Search and preview images in both online and offline modes.
 
 
+<p align="center">
+  <img src="https://github.com/SembaMax/pixabay-images-app/blob/main/screenshots/pixabay-video.gif" alt="animated" width="370"/>
+</p>
+
+
+
 ## App
 * Min. deployment target Android API 24
 * Kotlin source code

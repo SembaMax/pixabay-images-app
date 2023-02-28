@@ -52,6 +52,7 @@ import com.semba.pixabayimages.core.design.R as DesignR
 
 private val MinTopBarHeight = 135.dp
 private val MaxTopBarHeight = 150.dp
+private val LIST_CONTENT_PADDING = 7.dp
 
 @OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
@@ -250,8 +251,8 @@ fun ImagesGrid(modifier: Modifier = Modifier, gridState: LazyGridState = remembe
 
     LazyVerticalGrid(
         modifier = modifier
-            .padding(start = 7.dp, end = 7.dp, bottom = 7.dp, top = 7.dp)
             .testTag(TestTags.SEARCH_GRID_TEST_TAG),
+        contentPadding = PaddingValues(start = LIST_CONTENT_PADDING, end = LIST_CONTENT_PADDING, bottom = LIST_CONTENT_PADDING, top = LIST_CONTENT_PADDING),
         state = gridState,
         columns = GridCells.Fixed(CELL_COUNT),
         verticalArrangement = Arrangement.spacedBy(10.dp),

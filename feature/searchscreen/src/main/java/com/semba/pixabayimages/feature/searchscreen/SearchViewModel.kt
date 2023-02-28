@@ -4,6 +4,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.semba.pixabayimages.core.common.ErrorCode
+import com.semba.pixabayimages.core.common.errorMessage
 import com.semba.pixabayimages.core.design.navigation.*
 import com.semba.pixabayimages.data.model.search.ImageItem
 import com.semba.pixabayimages.feature.searchscreen.domain.SearchUseCase
@@ -54,8 +55,7 @@ class SearchViewModel @Inject constructor(private val searchUseCase: SearchUseCa
                         _uiState.value = _uiState.value.copy(isLoading = result.isLoading)
                     }
                     is ResultState.Error -> {
-                        //Todo: as a potential feature -> map here the corresponding error msg.
-                        _uiState.value = _uiState.value.copy(errorMsg = null)
+                        _uiState.value = _uiState.value.copy(errorMsg = result.errorCode?.errorMessage())
                         checkIfLimitReached(result.errorCode)
                     }
                     else -> {}

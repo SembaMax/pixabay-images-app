@@ -125,32 +125,30 @@ class SearchViewModelTest {
     }
 
     @Test
-    fun `show confirmation dialog state`() = runTest {
+    fun `test click Image Item state`() = runTest {
 
         val collectJob =
             launch(UnconfinedTestDispatcher()) { viewModel.uiState.collect() }
 
         val imageItem = mockk<ImageItem>()
-        viewModel.showConfirmationDialog(imageItem)
+        viewModel.onImageItemClicked(imageItem)
 
         assertEquals(viewModel.uiState.value.currentClickedImage, imageItem)
-        assertEquals(viewModel.uiState.value.showDialog, true)
 
         collectJob.cancel()
     }
 
     @Test
-    fun `dismiss confirmation dialog state`() = runTest {
+    fun `test remove clicked image item state`() = runTest {
 
         val collectJob =
             launch(UnconfinedTestDispatcher()) { viewModel.uiState.collect() }
 
         val imageItem = mockk<ImageItem>()
-        viewModel.showConfirmationDialog(imageItem)
-        viewModel.dismissConfirmationDialog()
+        viewModel.onImageItemClicked(imageItem)
+        viewModel.removeImageItemClicked()
 
         assertEquals(viewModel.uiState.value.currentClickedImage, ImageItem.empty())
-        assertEquals(viewModel.uiState.value.showDialog, false)
 
         collectJob.cancel()
     }
